@@ -54,36 +54,7 @@ func (n *NodeApplyableResourceInstance) CreateAddr() *addrs.AbsResourceInstance 
 
 // GraphNodeReferencer, overriding NodeAbstractResourceInstance
 func (n *NodeApplyableResourceInstance) References() []*addrs.Reference {
-	// Start with the usual resource instance implementation
-	ret := n.NodeAbstractResourceInstance.References()
-
-	// Applying a resource must also depend on the destruction of any of its
-	// dependencies, since this may for example affect the outcome of
-	// evaluating an entire list of resources with "count" set (by reducing
-	// the count).
-	//
-	// However, we can't do this in create_before_destroy mode because that
-	// would create a dependency cycle. We make a compromise here of requiring
-	// changes to be updated across two applies in this case, since the first
-	// plan will use the old values.
-	if !n.CreateBeforeDestroy() {
-		for _, ref := range ret {
-			switch tr := ref.Subject.(type) {
-			case addrs.ResourceInstance:
-				newRef := *ref // shallow copy so we can mutate
-				newRef.Subject = tr.Phase(addrs.ResourceInstancePhaseDestroy)
-				newRef.Remaining = nil // can't access attributes of something being destroyed
-				ret = append(ret, &newRef)
-			case addrs.Resource:
-				newRef := *ref // shallow copy so we can mutate
-				newRef.Subject = tr.Phase(addrs.ResourceInstancePhaseDestroy)
-				newRef.Remaining = nil // can't access attributes of something being destroyed
-				ret = append(ret, &newRef)
-			}
-		}
-	}
-
-	return ret
+	return n.NodeAbstractResourceInstance.References()
 }
 
 // GraphNodeAttachDependencies

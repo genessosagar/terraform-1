@@ -81,26 +81,8 @@ func (n *NodeDestroyResourceInstance) ModifyCreateBeforeDestroy(v bool) error {
 
 // GraphNodeReferenceable, overriding NodeAbstractResource
 func (n *NodeDestroyResourceInstance) ReferenceableAddrs() []addrs.Referenceable {
-	normalAddrs := n.NodeAbstractResourceInstance.ReferenceableAddrs()
-	destroyAddrs := make([]addrs.Referenceable, len(normalAddrs))
-
-	phaseType := addrs.ResourceInstancePhaseDestroy
-	if n.CreateBeforeDestroy() {
-		phaseType = addrs.ResourceInstancePhaseDestroyCBD
-	}
-
-	for i, normalAddr := range normalAddrs {
-		switch ta := normalAddr.(type) {
-		case addrs.Resource:
-			destroyAddrs[i] = ta.Phase(phaseType)
-		case addrs.ResourceInstance:
-			destroyAddrs[i] = ta.Phase(phaseType)
-		default:
-			destroyAddrs[i] = normalAddr
-		}
-	}
-
-	return destroyAddrs
+	// a destroy node is not referenceable
+	return []addrs.Referenceable{}
 }
 
 // GraphNodeReferencer, overriding NodeAbstractResource
