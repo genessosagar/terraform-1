@@ -819,7 +819,7 @@ func (n *NodeAbstractResourceInstance) plan(
 	}
 
 	// If we're importing and generating config, generate it now.
-	if n.Config == nil {
+	if n.Config == nil && n.generateConfigPath == "" {
 		// This shouldn't happen. A node that isn't generating config should
 		// have embedded config, and the rest of Terraform should enforce this.
 		// If, however, we didn't do things correctly the next line will panic,

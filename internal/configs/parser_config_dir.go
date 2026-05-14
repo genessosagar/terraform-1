@@ -71,7 +71,7 @@ func (p *Parser) LoadConfigDir(path string, opts ...Option) (*Module, hcl.Diagno
 	}
 	// Check if we need to load query files
 	if len(fileSet.Queries) > 0 {
-		queryFiles, fDiags := p.loadQueryFiles(path, fileSet.Queries)
+		queryFiles, fDiags := p.loadQueryFiles(fileSet.Queries)
 		diags = append(diags, fDiags...)
 		if mod != nil {
 			for _, qf := range queryFiles {
@@ -151,7 +151,7 @@ func (p Parser) ConfigDirFiles(dir string, opts ...Option) (primary, override []
 
 // IsConfigDir determines whether the given path refers to a directory that
 // exists and contains at least one Terraform config file (with a .tf or
-// .tf.json extension.). Note, we explicitely exclude checking for tests here
+// .tf.json extension.). Note, we explicitly exclude checking for tests here
 // as tests must live alongside actual .tf config files. Same goes for query files.
 func (p *Parser) IsConfigDir(path string, opts ...Option) bool {
 	pathSet, _ := p.dirFileSet(path, opts...)
@@ -205,7 +205,7 @@ func (p *Parser) loadTestFiles(basePath string, paths []string) (map[string]*Tes
 	return tfs, diags
 }
 
-func (p *Parser) loadQueryFiles(basePath string, paths []string) ([]*QueryFile, hcl.Diagnostics) {
+func (p *Parser) loadQueryFiles(paths []string) ([]*QueryFile, hcl.Diagnostics) {
 	files := make([]*QueryFile, 0, len(paths))
 	var diags hcl.Diagnostics
 

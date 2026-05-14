@@ -12,9 +12,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/zclconf/go-cty/cty"
-
 	"github.com/hashicorp/hcl/v2"
+	"github.com/zclconf/go-cty/cty"
 
 	"github.com/hashicorp/terraform/internal/addrs"
 	"github.com/hashicorp/terraform/internal/configs"
@@ -5407,4 +5406,9 @@ output "test_output" {
 			OriginDescription: "module.mod.old",
 		},
 	}))
+}
+
+func TestContextValidate_importNestedModule_ValidateInputVar(t *testing.T) {
+	// nested module + input variable
+
 }

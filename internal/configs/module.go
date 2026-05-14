@@ -10,7 +10,6 @@ import (
 
 	"github.com/hashicorp/terraform/internal/addrs"
 	"github.com/hashicorp/terraform/internal/experiments"
-
 	tfversion "github.com/hashicorp/terraform/version"
 )
 

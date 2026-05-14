@@ -655,8 +655,6 @@ func (n *NodeValidatableResource) validateImportTargets(ctx EvalContext) tfdiags
 
 	diags = diags.Append(n.validateConfigGen(ctx))
 
-	// Import blocks are only valid within the root module, and must be
-	// evaluated within that context
 	ctx = evalContextForModuleInstance(ctx, addrs.RootModuleInstance)
 
 	for _, imp := range n.importTargets {
@@ -666,11 +664,16 @@ func (n *NodeValidatableResource) validateImportTargets(ctx EvalContext) tfdiags
 			continue
 		}
 
+		if !imp.RelModule.Equal(addrs.RootModule) {
+			// if the import was in a nested module, we can't get the correct
+			// module instance context, so validation is skipped
+			continue
+		}
+
 		diags = diags.Append(validateImportSelfRef(n.Addr.Resource, imp.Config.ID))
 		if diags.HasErrors() {
 			return diags
 		}
-
 		if imp.Config.ForEach != nil {
 			diags = diags.Append(validateImportForEachRef(n.Addr.Resource, imp.Config.ForEach))
 			if diags.HasErrors() {

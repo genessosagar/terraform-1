@@ -2464,3 +2464,52 @@ import {
 		}
 	})
 }
+
+func TestContext2Plan_importDeferredResource(t *testing.T) {
+	addr := mustResourceInstanceAddr("test_object.a")
+	m := testModuleInline(t, map[string]string{
+		"main.tf": `
+import {
+  to   = test_object.a
+  id   = "123"
+}
+
+resource "test_object" "a" {}
+`,
+	})
+
+	p := simpleMockProvider()
+	ctx := testContext2(t, &ContextOpts{
+		Providers: map[addrs.Provider]providers.Factory{
+			addrs.NewDefaultProvider("test"): testProviderFuncFixed(p),
+		},
+	})
+	p.ImportResourceStateResponse = &providers.ImportResourceStateResponse{
+		Deferred: &providers.Deferred{
+			Reason: providers.DeferredReasonProviderConfigUnknown, // a made up problem for the test
+		},
+	}
+
+	diags := ctx.Validate(m, &ValidateOpts{})
+	tfdiags.AssertNoDiagnostics(t, diags)
+
+	plan, diags := ctx.Plan(m, states.NewState(), &PlanOpts{
+		Mode:               plans.NormalMode,
+		DeferralAllowed:    true,
+		GenerateConfigPath: "generated.tf", // Actual value here doesn't matter, as long as it is not empty.
+	})
+	tfdiags.AssertNoDiagnostics(t, diags)
+
+	instPlan := plan.Changes.ResourceInstance(addr)
+	if instPlan != nil {
+		t.Fatal("unexpected changes for the resource that should have been deferred")
+	}
+
+	if len(plan.DeferredResources) != 1 {
+		t.Fatalf("wrong number of deferred resources, wanted 1, got %d\n", len(plan.DeferredResources))
+	}
+
+	if plan.DeferredResources[0].ChangeSrc.Addr.String() != addr.String() {
+		t.Fatal("Wrong, but impressive - how did you even defer the wrong resource?")
+	}
+}

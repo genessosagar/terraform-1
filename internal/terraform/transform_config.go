@@ -123,7 +123,9 @@ func (t *ConfigTransformer) transformSingle(g *Graph, config *configs.Config) er
 				importTargets = append(importTargets, target)
 			}
 		default:
-			if target.Config.ToResource.Module.Equal(config.Path) {
+			// target.AbsToAddr is the absolute config resource, target.Config.ToResource is
+			// relative to the module of the import block
+			if target.AbsToConfigResource.Module.Equal(config.Path) {
 				importTargets = append(importTargets, target)
 			}
 		}
@@ -216,7 +218,7 @@ func (t *ConfigTransformer) transformSingle(g *Graph, config *configs.Config) er
 				imports = append(imports, i)
 
 			}
-			if i.Config != nil && i.Config.ToResource.Equal(configAddr) {
+			if i.Config != nil && i.AbsToConfigResource.Equal(configAddr) {
 				// This import target has been claimed by an actual resource,
 				// let's make a note of this to remove it from the targets.
 				matchedIndices = append(matchedIndices, ix)
