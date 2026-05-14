@@ -51,12 +51,12 @@ func TestParseInit_basicValid(t *testing.T) {
 				"-backend=false", "-force-copy=true",
 				"-from-module=./main-dir", "-json", "-get=false",
 				"-lock=false", "-lock-timeout=10s", "-reconfigure=true",
-				"-upgrade=true", "-lockfile=readonly", "-compact-warnings=true",
+				"-upgrade=true", "-compact-warnings=true",
 				"-ignore-remote-version=true", "-test-directory=./test-dir",
 			},
 			&Init{
 				FromModule:          "./main-dir",
-				Lockfile:            "readonly",
+				Lockfile:            "",
 				TestsDirectory:      "./test-dir",
 				ViewType:            ViewJSON,
 				Backend:             false,
@@ -153,6 +153,11 @@ func TestParseInit_invalid(t *testing.T) {
 		"with both -migrate-state and -reconfigure options set": {
 			args:         []string{"-migrate-state", "-reconfigure"},
 			wantErr:      "The -migrate-state and -reconfigure options are mutually-exclusive.",
+			wantViewType: ViewHuman,
+		},
+		"with both -upgrade and -lockfile=readonly options set": {
+			args:         []string{"-upgrade", "-lockfile=readonly"},
+			wantErr:      "The -upgrade flag conflicts with -lockfile=readonly.",
 			wantViewType: ViewHuman,
 		},
 	}

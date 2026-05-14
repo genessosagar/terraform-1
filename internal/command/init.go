@@ -376,6 +376,8 @@ const (
 // The method downloads any missing providers that aren't already downloaded and then returns
 // dependency lock data based on the configuration.
 // The dependency lock file itself isn't updated here.
+//
+// Calling code is responsible for validating inputs to this method, e.g. mutually exclusive flags.
 func (c *InitCommand) getProvidersFromConfig(ctx context.Context, config *configs.Config, upgrade bool, pluginDirs []string, flagLockfile string, view views.Init) (output bool, resultingLocks *depsfile.Locks, safeInitAction SafeInitAction, authResult *getproviders.PackageAuthenticationResult, diags tfdiags.Diagnostics) {
 	if config == nil {
 		return false, nil, SafeInitActionNotRelevant, nil, diags
@@ -502,12 +504,6 @@ func (c *InitCommand) getProvidersFromConfig(ctx context.Context, config *config
 
 	mode := providercache.InstallNewProvidersOnly
 	if upgrade {
-		if flagLockfile == "readonly" {
-			diags = diags.Append(fmt.Errorf("The -upgrade flag conflicts with -lockfile=readonly."))
-			view.Diagnostics(diags)
-			return true, nil, SafeInitActionInvalid, nil, diags
-		}
-
 		mode = providercache.InstallUpgrades
 	}
 
