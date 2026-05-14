@@ -72,13 +72,15 @@ Usage: terraform [global options] state migrate [options]
 
 Options:
 
-  -source-provider-lock-file	   Path to a provider lock file for the source provider (requires -input=false).
+  -source-provider-lock-file       Path to a provider lock file for the source provider (requires -input=false).
+                                   Defaults to using the working directory's .terraform.lock.hcl file.
 
   -destination-provider-lock-file  Path to a provider lock file for the destination provider (requires -input=false).
+                                   Defaults to using the working directory's .terraform.lock.hcl file.
 
-  -upgrade  					   Trigger upgrade of the provider.
-  
-  -input=true					   Enable input for interactive prompts (defaults to true, set to false in automation).
+  -upgrade                         Trigger upgrade of the provider used for state storage.
+
+  -input=true                      Enable input for interactive prompts (defaults to true, set to false in automation).
 `
 	return strings.TrimSpace(helpText)
 }
